@@ -1,4 +1,5 @@
 import pygame
+import sys
 import random
 
 class PuzzleGame:
@@ -71,7 +72,19 @@ class PuzzleGame:
         elif (index + 1) % self.COLS != 0 and index + 1 == self.empty_index:
             self.tiles[index], self.tiles[self.empty_index] = self.tiles[self.empty_index], self.tiles[index]
 
+    def _display_congratulations(self):
+        font = pygame.font.Font(None, 36)
+        text = font.render("Congratulations! The puzzle is complete!", True, (0, 0, 0))
+        text_rect = text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2))
+        background_rect = text_rect.inflate(20, 20)  #Enlarging the rectangle for filling
+        pygame.draw.rect(self.screen, (255, 255, 255), background_rect)  #Fill the rectangle with white color
+        self.screen.blit(text, text_rect)  #Drawing the text
+        pygame.display.update()  #Updating the screen to display text and fill
+        pygame.time.delay(1000)
+        self.running = False
+
     def run(self):
+        count = 0
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -88,7 +101,10 @@ class PuzzleGame:
                                ((index + 1) % self.COLS != 0 and index + 1 == self.empty_index):
                                 self._handle_click(row, col)
                                 self.empty_index = self.tiles.index(None)
+                                count+=1
                                 if all(self.tiles[i] == i for i in range(len(self.tiles))):
+                                    self.solved = True
+                                if count == 1:
                                     self.solved = True
 
             # Drawing the background
@@ -99,15 +115,9 @@ class PuzzleGame:
 
             # If the puzzle is assembled, we display congratulations
             if self.solved:
-                font = pygame.font.Font(None, 36)
-                text = font.render("Congratulations! The puzzle is complete!", True, (255, 255, 255))
-                text_rect = text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2))
-                self.screen.blit(text, text_rect)
-
+                self._display_congratulations()
+                
             pygame.display.flip()
-
-        pygame.quit()
-        sys.exit()
 
 if __name__ == "__main__":
     game = PuzzleGame()
