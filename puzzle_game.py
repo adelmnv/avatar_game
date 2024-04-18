@@ -19,17 +19,17 @@ class PuzzleGame:
         pygame.display.set_caption("Slide Puzzle")
 
         # Uploading an image for a puzzle and breaking it into pieces
-        # !Caution picture is needed!
-        self.tiles = self._load_and_split_image("image.jpg", self.WIDTH, self.HEIGHT)
+        self.tiles = self._load_and_split_image("sources/images/earth/pazzle-earth.png", self.WIDTH, self.HEIGHT)
         self.tiles = self._shuffle_tiles(self.tiles)
         self.empty_index = self.tiles.index(None)
 
         # Uploading an image for the background
-        # !Caution picture is needed!
-        self.background = self._load_image("background.jpg", self.WIDTH, self.HEIGHT)
+        self.background = self._load_image("sources/images/earth/pazzle-earth_dark.png", self.WIDTH, self.HEIGHT)
 
         self.running = True
         self.solved = False
+
+        pygame.mixer.music.load('sources/sounds/earth/puzzle_soundtrack.mp3')
 
     def _load_image(self, image_path, width, height):
         image = pygame.image.load(image_path)
@@ -77,14 +77,15 @@ class PuzzleGame:
         text = font.render("Congratulations! The puzzle is complete!", True, (0, 0, 0))
         text_rect = text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2))
         background_rect = text_rect.inflate(20, 20)  #Enlarging the rectangle for filling
-        pygame.draw.rect(self.screen, (255, 255, 255), background_rect)  #Fill the rectangle with white color
+        pygame.draw.rect(self.screen, (71, 107, 4), background_rect)  #Fill the rectangle with white color
         self.screen.blit(text, text_rect)  #Drawing the text
         pygame.display.update()  #Updating the screen to display text and fill
-        pygame.time.delay(1000)
+        pygame.time.delay(2000)
         self.running = False
 
     def run(self):
-        #count = 0
+        # count = 0
+        pygame.mixer.music.play(-1)
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -99,6 +100,7 @@ class PuzzleGame:
                             if index - self.COLS == self.empty_index or index + self.COLS == self.empty_index or \
                                (index % self.COLS != 0 and index - 1 == self.empty_index) or \
                                ((index + 1) % self.COLS != 0 and index + 1 == self.empty_index):
+                                pygame.mixer.Sound('sources/sounds/earth/move.mp3').play()
                                 self._handle_click(row, col)
                                 self.empty_index = self.tiles.index(None)
                                 #count+=1
@@ -116,6 +118,7 @@ class PuzzleGame:
             # If the puzzle is assembled, we display congratulations
             if self.solved:
                 self._display_congratulations()
+                pygame.mixer.music.stop()
                 
             pygame.display.flip()
 
