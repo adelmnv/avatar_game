@@ -26,6 +26,8 @@ class PuzzleGame:
         self.running = True
         self.solved = False
 
+        self.intro_shown = False
+
         pygame.mixer.music.load('sources/sounds/earth/puzzle_soundtrack.mp3')
 
     def _load_image(self, image_path, width, height):
@@ -80,9 +82,25 @@ class PuzzleGame:
         pygame.time.delay(2000)
         self.running = False
 
+    def show_intro(self):
+        # Display the intro only if it has not been displayed yet
+        if not self.intro_shown:
+            intro_image = pygame.transform.scale(pygame.image.load("sources/images/earth/earth_intro.jpg"), (600, 600))
+            self.screen.blit(intro_image, (0, 0))
+            pygame.display.update()
+            intro_done = False
+            while not intro_done:
+                for event in pygame.event.get():
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                        intro_done = True
+                pygame.time.Clock().tick(30)  # Adjust as needed
+
+            self.intro_shown = True
+
     def run(self):
         # count = 0 # test (to end fast)
         pygame.mixer.music.play(-1)
+        self.show_intro()
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

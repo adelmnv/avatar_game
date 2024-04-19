@@ -26,14 +26,14 @@ class ArrowsGame:
 
         for key in self.arrow_images:
             self.arrow_images[key] = pygame.transform.scale(self.arrow_images[key], (600, 600))
-        
-        pygame.mixer.music.load('sources/sounds/fire/dragon_dance_v2.mp3')
 
         self.running = True
 
         self.count = 2
 
         self.solved = False
+
+        self.intro_shown = False
 
     def _generate_combination(self):
         arrows = ['up', 'down', 'left', 'right']
@@ -63,8 +63,27 @@ class ArrowsGame:
             self.screen.blit(self.arrow_images['standard'], (0, 0))
             pygame.display.update()  
             pygame.time.delay(500)  
+    
+    def show_intro(self):
+        # Display the intro only if it has not been displayed yet
+        if not self.intro_shown:
+            intro_sound = pygame.mixer.Sound('sources/sounds/fire/dragon_dance_intro.mp3').play(-1)
+            intro_image = pygame.transform.scale(pygame.image.load("sources/images/fire/fire_intro.png"), (600, 600))
+            self.screen.blit(intro_image, (0, 0))
+            pygame.display.update()
+            intro_done = False
+            while not intro_done:
+                for event in pygame.event.get():
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                        intro_done = True
+                pygame.time.Clock().tick(30)  # Adjust as needed
+            
+            intro_sound.stop()
+            self.intro_shown = True
 
     def run(self):
+        self.show_intro()
+        pygame.mixer.music.load('sources/sounds/fire/dragon_dance_v2.mp3')
         pygame.mixer.music.play(-1)
         while self.running:
             self._display_message("Remember the combination")
