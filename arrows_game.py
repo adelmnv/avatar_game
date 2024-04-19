@@ -27,15 +27,13 @@ class ArrowsGame:
         for key in self.arrow_images:
             self.arrow_images[key] = pygame.transform.scale(self.arrow_images[key], (600, 600))
         
-        #self.message_background = pygame.transform.scale(pygame.image.load("sources/images/arrow_up.jpeg"), (400, 100))
-        
         pygame.mixer.music.load('sources/sounds/fire/dragon_dance_v2.mp3')
 
         self.running = True
 
         self.count = 2
 
-        self.successed = False
+        self.solved = False
 
     def _generate_combination(self):
         arrows = ['up', 'down', 'left', 'right']
