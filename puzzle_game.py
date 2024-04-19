@@ -81,7 +81,7 @@ class PuzzleGame:
         self.running = False
 
     def run(self):
-        count = 0 #
+        # count = 0 # test (to end fast)
         pygame.mixer.music.play(-1)
         while self.running:
             for event in pygame.event.get():
@@ -102,11 +102,11 @@ class PuzzleGame:
                                 pygame.mixer.Sound('sources/sounds/earth/move.mp3').play()
                                 self._handle_click(row, col)
                                 self.empty_index = self.tiles.index(None)
-                                count+=1 #
+                                # count+=1 #
                                 if all(self.tiles[i] == i for i in range(len(self.tiles))):
                                     self.solved = True
-                                if count == 1: #
-                                    self.solved = True #
+                                #if count == 1: #
+                                    #self.solved = True #
 
             # Drawing the background
             self.screen.blit(self.background, (0, 0))
