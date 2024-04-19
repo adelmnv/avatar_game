@@ -86,6 +86,7 @@ class PuzzleGame:
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    pygame.mixer.music.stop()
                     self.running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN and not self.solved:
                     if pygame.mouse.get_pressed()[0]:

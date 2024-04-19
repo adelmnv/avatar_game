@@ -97,6 +97,7 @@ class ArrowsGame:
                         elif event.key == pygame.K_RETURN:
                             input_complete = True
                     elif event.type == pygame.QUIT:
+                        pygame.mixer.music.stop()
                         self.running = False
                 if arrow:  # Checking if an arrow was pressed
                     pygame.mixer.Sound('sources/sounds/fire/fire_sound.mp3').play()
