@@ -35,6 +35,8 @@ class ArrowsGame:
 
         self.count = 2
 
+        self.successed = False
+
     def _generate_combination(self):
         arrows = ['up', 'down', 'left', 'right']
         return [random.choice(arrows) for _ in range(self.count)]
@@ -99,6 +101,7 @@ class ArrowsGame:
                     elif event.type == pygame.QUIT:
                         pygame.mixer.music.stop()
                         self.running = False
+                        return self.solved
                 if arrow:  # Checking if an arrow was pressed
                     pygame.mixer.Sound('sources/sounds/fire/fire_sound.mp3').play()
                     self.screen.blit(self.arrow_images[arrow], (0,0))
@@ -111,12 +114,14 @@ class ArrowsGame:
             if user_input == combination:
                 # Checking if game is completed
                 if self.count == 5:
+                    self.solved = True
                     pygame.mixer.music.stop()
                     pygame.mixer.Sound('sources/sounds/fire/dragon_dance_win.mp3').play()
                     self._display_message("You've managed to master fire!")
                     pygame.time.delay(1000)
                     pygame.mixer.music.stop()
                     self.running = False
+                    return self.solved
                 else:
                     self._display_message("Right. Go on...")
                     self.count += 1
@@ -127,6 +132,7 @@ class ArrowsGame:
                 pygame.time.delay(1000)
                 pygame.mixer.music.stop()
                 self.running = False
+                return self.solved
                     
 
 
