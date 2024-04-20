@@ -2,6 +2,7 @@ import pygame
 import sys
 from puzzle_game import PuzzleGame
 from arrows_game import ArrowsGame
+from maze_game1 import MazeGame
 
 class MainMenu:
     def __init__(self):
@@ -86,6 +87,12 @@ class MainMenu:
                     self.arrows_completed = arrows_game.run()
                     pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
                     pygame.mixer.music.play(-1, music_pos)
+                elif selected_option == "Water" and not self.maze_completed:
+                    pygame.mixer.music.pause()
+                    maze_game = MazeGame()
+                    self.maze_completed = maze_game.run()
+                    pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
+                    pygame.mixer.music.play(-1, music_pos)
 
     
     def show_intro(self):
@@ -123,9 +130,15 @@ class MainMenu:
                         x, y = pygame.mouse.get_pos()
                         self.handle_click(x, y)
                 # If all games are successfully completed, show the ending poster
-                if self.puzzle_completed and self.arrows_completed:
+                if self.puzzle_completed and self.arrows_completed and self.maze_completed:
                     self.completed = True
                     pygame.mixer.music.stop()
+            elif self.completed:
+                self.show_ending_poster()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.running = False
+
 
 if __name__ == "__main__":
     menu = MainMenu()
