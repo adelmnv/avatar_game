@@ -2,9 +2,16 @@ import pygame
 import sys
 from puzzle_game import PuzzleGame
 from arrows_game import ArrowsGame
+from maze_game import MazeGame
 
 class MainMenu:
+    """
+    A class representing the main menu of the game, providing options to play different mini-games.
+    """
     def __init__(self):
+        """
+        Initialize the main menu.
+        """
         pygame.init()
         pygame.mixer.init()
         
@@ -46,6 +53,9 @@ class MainMenu:
 
 
     def draw_menu(self):
+        """
+        Draw the main menu with animated options.
+        """
         self.screen.fill(self.GREY)
         num_rows = 2
         num_cols = 2
@@ -64,31 +74,47 @@ class MainMenu:
 
 
     def handle_click(self, x, y):
-            num_rows = 2
-            num_cols = 2
-            tile_width = self.WIDTH // num_cols
-            tile_height = self.HEIGHT // num_rows
-            row = y // tile_height
-            col = x // tile_width
-            index = row * num_cols + col
-            if index < len(self.options):
-                music_pos = pygame.mixer.music.get_pos()
-                selected_option = self.options[index]
-                if selected_option == "Earth" and not self.puzzle_completed:
-                    pygame.mixer.music.pause()
-                    puzzle_game = PuzzleGame()
-                    self.puzzle_completed = puzzle_game.run()
-                    pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
-                    pygame.mixer.music.play(-1, music_pos)
-                elif selected_option == "Fire" and not self.arrows_completed:
-                    pygame.mixer.music.pause()
-                    arrows_game = ArrowsGame()
-                    self.arrows_completed = arrows_game.run()
-                    pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
-                    pygame.mixer.music.play(-1, music_pos)
+        """
+        Handle mouse click events on the main menu options.
+
+        Args:
+            x (int): The x-coordinate of the mouse click.
+            y (int): The y-coordinate of the mouse click.
+        """
+        num_rows = 2
+        num_cols = 2
+        tile_width = self.WIDTH // num_cols
+        tile_height = self.HEIGHT // num_rows
+        row = y // tile_height
+        col = x // tile_width
+        index = row * num_cols + col
+        if index < len(self.options):
+            music_pos = pygame.mixer.music.get_pos()
+            selected_option = self.options[index]
+            if selected_option == "Earth" and not self.puzzle_completed:
+                pygame.mixer.music.pause()
+                puzzle_game = PuzzleGame()
+                self.puzzle_completed = puzzle_game.run()
+                pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
+                pygame.mixer.music.play(-1, music_pos)
+            elif selected_option == "Fire" and not self.arrows_completed:
+                pygame.mixer.music.pause()
+                arrows_game = ArrowsGame()
+                self.arrows_completed = arrows_game.run()
+                pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
+                pygame.mixer.music.play(-1, music_pos)
+            elif selected_option == "Water" and not self.maze_completed:
+                pygame.mixer.music.pause()
+                maze_game = MazeGame()
+                self.maze_completed = maze_game.run()
+                pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
+                pygame.mixer.music.play(-1, music_pos)
 
     
     def show_intro(self):
+        """
+        Display the introduction to the game.
+        """
         # Display the intro only if it has not been displayed yet
         if not self.intro_shown:
             pygame.mixer.Sound('sources/sounds/main_menu/intro.mp3').play()
@@ -100,6 +126,9 @@ class MainMenu:
 
 
     def show_ending_poster(self):
+        """
+        Display the ending poster of the game.
+        """
         if not self.end_shown:
             pygame.mixer.music.load('sources/sounds/main_menu/end.mp3')
             pygame.mixer.music.play(-1)
@@ -109,6 +138,9 @@ class MainMenu:
             pygame.display.update()
 
     def run(self):
+        """
+        Run the main menu loop.
+        """
         # Show intro
         self.show_intro()
         pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
@@ -123,9 +155,15 @@ class MainMenu:
                         x, y = pygame.mouse.get_pos()
                         self.handle_click(x, y)
                 # If all games are successfully completed, show the ending poster
-                if self.puzzle_completed and self.arrows_completed:
+                if self.puzzle_completed and self.arrows_completed and self.maze_completed:
                     self.completed = True
                     pygame.mixer.music.stop()
+            elif self.completed:
+                self.show_ending_poster()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        self.running = False
+
 
 if __name__ == "__main__":
     menu = MainMenu()

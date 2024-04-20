@@ -3,7 +3,13 @@ import sys
 import random
 
 class PuzzleGame:
+    """
+    A class representing the 'Earth - Stone Mosaic' puzzle game.
+    """
     def __init__(self):
+        """
+        Initialize the puzzle game.
+        """
         pygame.init()
 
         # Size of the window
@@ -31,11 +37,33 @@ class PuzzleGame:
         pygame.mixer.music.load('sources/sounds/earth/puzzle_soundtrack.mp3')
 
     def _load_image(self, image_path, width, height):
+        """
+        Load an image and scale it to the specified width and height.
+
+        Args:
+            image_path (str): The path to the image file.
+            width (int): The width to which the image should be scaled.
+            height (int): The height to which the image should be scaled.
+
+        Returns:
+            pygame.Surface: The loaded and scaled image.
+        """
         image = pygame.image.load(image_path)
         image = pygame.transform.scale(image, (width, height))
         return image
 
     def _load_and_split_image(self, image_path, width, height):
+        """
+        Load an image, split it into tiles, and return them as a list.
+
+        Args:
+            image_path (str): The path to the image file.
+            width (int): The width of the image.
+            height (int): The height of the image.
+
+        Returns:
+            list: A list of pygame.Surfaces, each representing a puzzle tile.
+        """
         image = self._load_image(image_path, width, height)
         tile_width = image.get_width() // self.COLS
         tile_height = image.get_height() // self.ROWS
@@ -48,12 +76,24 @@ class PuzzleGame:
         return tiles
 
     def _shuffle_tiles(self, tiles):
+        """
+        Shuffle the puzzle tiles randomly.
+
+        Args:
+            tiles (list): A list of puzzle tiles.
+
+        Returns:
+            list: The shuffled list of puzzle tiles.
+        """
         shuffled_tiles = tiles[:-1]  # Exclude the last (empty) piece from mixing
         random.shuffle(shuffled_tiles)
         shuffled_tiles.append(None)  # Add an empty piece to the end
         return shuffled_tiles
 
     def _draw_tiles(self):
+        """
+        Draw the puzzle tiles on the screen.
+        """
         for i, tile in enumerate(self.tiles):
             if tile is not None:
                 row, col = i // self.COLS, i % self.COLS
@@ -61,6 +101,13 @@ class PuzzleGame:
                 self.screen.blit(tile, (x, y))
 
     def _handle_click(self, row, col):
+        """
+        Handle a click on a puzzle tile.
+
+        Args:
+            row (int): The row index of the clicked tile.
+            col (int): The column index of the clicked tile.
+        """
         index = row * self.COLS + col
         if index - self.COLS == self.empty_index:
             self.tiles[index], self.tiles[self.empty_index] = self.tiles[self.empty_index], self.tiles[index]
@@ -72,6 +119,9 @@ class PuzzleGame:
             self.tiles[index], self.tiles[self.empty_index] = self.tiles[self.empty_index], self.tiles[index]
 
     def _display_congratulations(self):
+        """
+        Display a message congratulating the player for solving the puzzle.
+        """
         font = pygame.font.SysFont('Papyrus', 36)
         text = font.render("You've managed to master earth!", True, (0, 0, 0))
         text_rect = text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2))
@@ -83,6 +133,9 @@ class PuzzleGame:
         self.running = False
 
     def show_intro(self):
+        """
+        Display the game introduction.
+        """
         # Display the intro only if it has not been displayed yet
         if not self.intro_shown:
             intro_image = pygame.transform.scale(pygame.image.load("sources/images/earth/earth_intro.jpg"), (600, 600))
@@ -98,6 +151,12 @@ class PuzzleGame:
             self.intro_shown = True
 
     def run(self):
+        """
+        Run the main game loop.
+
+        Returns:
+            bool: True if the player wins, False otherwise.
+        """
         # count = 0 # test (to end fast)
         pygame.mixer.music.play(-1)
         self.show_intro()
