@@ -2,7 +2,7 @@ import pygame
 import sys
 from puzzle_game import PuzzleGame
 from arrows_game import ArrowsGame
-from maze_game1 import MazeGame
+from maze_game import MazeGame
 
 class MainMenu:
     def __init__(self):
