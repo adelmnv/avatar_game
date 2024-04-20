@@ -4,7 +4,14 @@ import os
 import random
 
 class ArrowsGame:
+    """
+    A class representing the 'Fire - The Dancing Dragon' game.
+    """
+
     def __init__(self):
+        """
+        Initialize the game.
+        """
         pygame.init()
 
         # Size of the window
@@ -36,10 +43,22 @@ class ArrowsGame:
         self.intro_shown = False
 
     def _generate_combination(self):
+        """
+        Generate a random combination of arrows.
+
+        Returns:
+            list: A list containing the arrow directions in the generated combination.
+        """
         arrows = ['up', 'down', 'left', 'right']
         return [random.choice(arrows) for _ in range(self.count)]
 
     def _display_message(self, message):
+        """
+        Display a message on the screen.
+
+        Args:
+            message (str): The message to be displayed.
+        """
         self.screen.blit(self.arrow_images['standard_dark'], (0, 0))
         font = pygame.font.SysFont('Papyrus', 36)
         text = font.render(message, True, (0, 0, 0))
@@ -51,6 +70,12 @@ class ArrowsGame:
         pygame.time.delay(1000) 
 
     def _display_combination(self, combination):
+        """
+        Display the arrow combination on the screen.
+
+        Args:
+            combination (list): A list containing the arrow directions to be displayed.
+        """
         self.screen.blit(self.arrow_images['standard'], (0, 0))
         pygame.display.update()  
         pygame.time.delay(1000)  
@@ -65,6 +90,9 @@ class ArrowsGame:
             pygame.time.delay(500)  
     
     def show_intro(self):
+        """
+        Display the game introduction.
+        """
         # Display the intro only if it has not been displayed yet
         if not self.intro_shown:
             intro_sound = pygame.mixer.Sound('sources/sounds/fire/dragon_dance_intro.mp3').play(-1)
@@ -82,6 +110,12 @@ class ArrowsGame:
             self.intro_shown = True
 
     def run(self):
+        """
+        Run the main game loop.
+
+        Returns:
+            bool: True if the game is solved, False otherwise.
+        """
         self.show_intro()
         pygame.mixer.music.load('sources/sounds/fire/dragon_dance_v2.mp3')
         pygame.mixer.music.play(-1)
@@ -135,7 +169,7 @@ class ArrowsGame:
                     pygame.mixer.music.stop()
                     pygame.mixer.Sound('sources/sounds/fire/dragon_dance_win.mp3').play()
                     self._display_message("You've managed to master fire!")
-                    pygame.time.delay(1000)
+                    pygame.time.delay(3000)
                     pygame.mixer.music.stop()
                     self.running = False
                     return self.solved

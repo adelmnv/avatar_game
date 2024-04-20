@@ -3,7 +3,13 @@ import random
 import sys
 
 class MazeGame:
+    """
+    A class representing the 'Water - Flow Control' game.
+    """
     def __init__(self):
+        """
+        Initialize the game.
+        """
         pygame.init()
 
         # Colors
@@ -46,6 +52,12 @@ class MazeGame:
         self.clock = pygame.time.Clock()
 
     def generate_maze(self):
+        """
+        Generate a maze using a modified version of the recursive backtracking algorithm.
+
+        Returns:
+            list: A 2D list representing the generated maze.
+        """
         maze = [[1] * self.GRID_WIDTH for _ in range(self.GRID_HEIGHT)]
 
         # Set starting point
@@ -76,16 +88,28 @@ class MazeGame:
         return maze
 
     def draw_maze(self, maze):
+        """
+        Draw the maze on the screen.
+
+        Args:
+            maze (list): A 2D list representing the maze.
+        """
         for y in range(self.GRID_HEIGHT):
             for x in range(self.GRID_WIDTH):
                 if maze[y][x] == 1:
                     pygame.draw.circle(self.screen, self.BROWN, (x * self.CELL_SIZE + self.CELL_SIZE // 2, y * self.CELL_SIZE + self.CELL_SIZE // 2), self.CELL_SIZE // 2)
 
     def draw_start_end(self):
+        """
+        Draw the start and end points on the maze.
+        """
         pygame.draw.circle(self.screen, self.GREEN, (self.CELL_SIZE + self.CELL_SIZE // 2, self.CELL_SIZE + self.CELL_SIZE // 2), self.CELL_SIZE // 2)
         pygame.draw.circle(self.screen, self.RED, ((self.GRID_WIDTH - 3) * self.CELL_SIZE + self.CELL_SIZE // 2, (self.GRID_HEIGHT - 3) * self.CELL_SIZE + self.CELL_SIZE // 2), self.CELL_SIZE // 2)
 
     def show_intro(self):
+        """
+        Display the game introduction.
+        """
         # Display the intro only if it has not been displayed yet
         if not self.intro_shown:
             intro_image = pygame.transform.scale(pygame.image.load("sources/images/water/water_intro.jpg"), (600, 600))
@@ -101,6 +125,12 @@ class MazeGame:
             self.intro_shown = True
 
     def run(self):
+        """
+        Run the main game loop.
+
+        Returns:
+            bool: True if the player wins, False otherwise.
+        """
         maze = self.generate_maze()
         player_x = 1
         player_y = 1
