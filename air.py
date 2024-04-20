@@ -53,10 +53,6 @@ class AirGame:
         self.win_font = pygame.font.Font('sources/fonts/air_font.ttf',35) 
         self.win_font2 = pygame.font.Font('sources/fonts/air_font.ttf',18)
         self.lose_font = pygame.font.Font('sources/fonts/air_font.ttf',35) 
-        #music
-        self.music = pygame.mixer.music.load('sources/sounds/air/air.mp3')
-        pygame.mixer.music.play(-1)
-        pygame.mixer.music.set_volume(0.2) 
         #is_passed
         self.running = True
         self.solved = False
@@ -143,16 +139,11 @@ class AirGame:
     def draw_menu(self):
         """Draw the menu screen"""
         self.screen.blit(self.background_image_of_menu, (0, 0))
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
         pygame.display.flip()
 
     def handle_menu(self):
         """Handle menu input"""
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     return True
@@ -187,6 +178,7 @@ class AirGame:
         self.screen.blit(self.current_score,(self.W//2-100,320))
         pygame.display.flip()
         pygame.time.delay(5000)
+        pygame.mixer.stop()
         return None
      
     def win_game_menu(self):
@@ -199,6 +191,7 @@ class AirGame:
         self.screen.blit(self.win_text2,(self.W//2-150,320))
         pygame.display.flip()
         pygame.time.delay(5000)
+        pygame.mixer.stop()
         return None
     
     def run_game(self):
@@ -287,7 +280,11 @@ class AirGame:
                     self.passed = False
                     return self.passed
                 if event.type == pygame.MOUSEBUTTONDOWN and self.flying == False and self.game_over == False:
-                    self.flying = True 
+                    self.flying = True
+                    #music
+                    self.music = pygame.mixer.music.load('sources/sounds/air/air.mp3')
+                    pygame.mixer.music.play(-1)
+                    pygame.mixer.music.set_volume(0.2)  
 
 #start game
 if __name__ == "__main__":
