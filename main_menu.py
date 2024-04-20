@@ -44,14 +44,42 @@ class MainMenu:
 
         self.music_pos = 0 
         
+        self.completed_games = 0
+
         # Load element animation images and scale them to 300x300
         self.animations = {
             "Air": [pygame.transform.scale(pygame.image.load("sources/images/main_menu/air{}.jpeg".format(i)), (300, 300)) for i in [1, 2, 3, 2]],
             "Water": [pygame.transform.scale(pygame.image.load("sources/images/main_menu/water{}.jpeg".format(i)), (300, 300)) for i in [1, 2, 3, 2]],
             "Earth": [pygame.transform.scale(pygame.image.load("sources/images/main_menu/earth{}.jpeg".format(i)), (300, 300)) for i in [1, 2, 3, 2]],
-            "Fire": [pygame.transform.scale(pygame.image.load("sources/images/main_menu/fire{}.jpeg".format(i)), (300, 300)) for i in [1, 2, 3, 2]],
+            "Fire": [pygame.transform.scale(pygame.image.load("sources/images/main_menu/fire{}.jpeg".format(i)), (300, 300)) for i in [1, 2, 3, 2]]
         }
 
+        self.stable_icons = {
+            "Air": pygame.transform.scale(pygame.image.load("sources/images/main_menu/air_dark.jpeg"), (300, 300)),
+            "Water": pygame.transform.scale(pygame.image.load("sources/images/main_menu/water_dark.jpeg"), (300, 300)),
+            "Earth": pygame.transform.scale(pygame.image.load("sources/images/main_menu/earth_dark.jpeg"), (300, 300)),
+            "Fire": pygame.transform.scale(pygame.image.load("sources/images/main_menu/fire_dark.jpeg"), (300, 300))
+        }
+
+
+    # def draw_menu(self):
+    #     """
+    #     Draw the main menu with animated options.
+    #     """
+    #     self.screen.fill(self.GREY)
+    #     num_rows = 2
+    #     num_cols = 2
+    #     tile_width = self.WIDTH // num_cols
+    #     tile_height = self.HEIGHT // num_rows
+    #     for i in range(num_rows):
+    #         for j in range(num_cols):
+    #             index = i * num_cols + j
+    #             option = self.options[index]
+    #             frame_index = pygame.time.get_ticks() // 400 % len(self.animations[option])  # Calculate frame index based on time
+    #             animation = self.animations[option][frame_index]  # Get current frame of animation
+    #             animation_rect = animation.get_rect(center=((j + 0.5) * tile_width, (i + 0.5) * tile_height))
+    #             self.screen.blit(animation, animation_rect)
+    #     pygame.display.update()
 
     def draw_menu(self):
         """
@@ -62,15 +90,30 @@ class MainMenu:
         num_cols = 2
         tile_width = self.WIDTH // num_cols
         tile_height = self.HEIGHT // num_rows
+
+        # Determine the maximum number of animations based on completed games
+        max_animations = min(self.completed_games + 1, len(self.options))
+
         for i in range(num_rows):
             for j in range(num_cols):
                 index = i * num_cols + j
-                option = self.options[index]
-                frame_index = pygame.time.get_ticks() // 400 % len(self.animations[option])  # Calculate frame index based on time
-                animation = self.animations[option][frame_index]  # Get current frame of animation
-                animation_rect = animation.get_rect(center=((j + 0.5) * tile_width, (i + 0.5) * tile_height))
-                self.screen.blit(animation, animation_rect)
+                if index < max_animations:
+                    option = self.options[index]
+                    frame_index = pygame.time.get_ticks() // 400 % len(self.animations[option])  # Calculate frame index based on time
+                    animation = self.animations[option][frame_index]  # Get current frame of animation
+                    animation_rect = animation.get_rect(center=((j + 0.5) * tile_width, (i + 0.5) * tile_height))
+                    self.screen.blit(animation, animation_rect)
+                else:
+                    option = self.options[index]
+                    stable_icon_rect = self.stable_icons[option].get_rect(center=((j + 0.5) * tile_width, (i + 0.5) * tile_height))
+                    self.screen.blit(self.stable_icons[option], stable_icon_rect)
+
         pygame.display.update()
+
+    def handle_game_completion(self, is_completed):
+        if is_completed:
+        # Increment the completed games counter
+            self.completed_games += 1
 
 
 
@@ -98,6 +141,7 @@ class MainMenu:
                 pygame.mixer.music.pause()
                 air_game = AirGame()
                 self.flappy_aang_completed = air_game.start()
+                self.handle_game_completion(self.flappy_aang_completed)
                 pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
                 pygame.mixer.music.play(-1, music_pos)
             elif selected_option == "Water" and not self.maze_completed:
@@ -106,6 +150,7 @@ class MainMenu:
                 pygame.mixer.music.pause()
                 maze_game = MazeGame()
                 self.maze_completed = maze_game.run()
+                self.handle_game_completion(self.maze_completed)
                 pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
                 pygame.mixer.music.play(-1, music_pos)
             elif selected_option == "Earth" and not self.puzzle_completed:
@@ -114,6 +159,7 @@ class MainMenu:
                 pygame.mixer.music.pause()
                 puzzle_game = PuzzleGame()
                 self.puzzle_completed = puzzle_game.run()
+                self.handle_game_completion(self.puzzle_completed)
                 pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
                 pygame.mixer.music.play(-1, music_pos)
             elif selected_option == "Fire" and not self.arrows_completed:
@@ -122,6 +168,7 @@ class MainMenu:
                 pygame.mixer.music.pause()
                 arrows_game = ArrowsGame()
                 self.arrows_completed = arrows_game.run()
+                self.handle_game_completion(self.arrows_completed)
                 pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
                 pygame.mixer.music.play(-1, music_pos)
 
