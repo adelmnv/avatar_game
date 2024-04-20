@@ -34,11 +34,11 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Лабиринт")
 
 # Фоновое изображение
-background = pygame.image.load("background1.jpg")
+background = pygame.image.load("sources/images/water/maze_background.jpeg")
 background = pygame.transform.scale(background, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Загрузка фоновой музыки
-pygame.mixer.music.load("background_music.mp3")
+pygame.mixer.music.load("sources/sounds/water/maze_music.mp3")
 pygame.mixer.music.play(-1)  # -1 означает бесконечное повторение
 
 # Генерация лабиринта
