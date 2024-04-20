@@ -1,9 +1,9 @@
 import pygame
 import sys
-from puzzle_game import PuzzleGame
-from arrows_game import ArrowsGame
-from maze_game import MazeGame
-from air import AirGame
+from air_game import AirGame
+from water_game import WaterGame
+from earth_game import EarthGame
+from fire_game import FireGame
 
 class MainMenu:
     """
@@ -25,7 +25,7 @@ class MainMenu:
         
         # Create window
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
-        pygame.display.set_caption("Main")
+        pygame.display.set_caption("Avatar: The last airbender")
         
         self.font = pygame.font.Font(None, 36)
         self.options = ["Air", "Water", "Earth", "Fire"]
@@ -36,15 +36,14 @@ class MainMenu:
         
         # Flags to track the state of each game
         self.intro_shown = False
-        self.puzzle_completed = False
-        self.arrows_completed = False
-        self.maze_completed = False
-        self.flappy_aang_completed = False
+        self.earth_completed = False
+        self.fire_completed = False
+        self.water_completed = False
+        self.air_completed = False
         self.end_shown = False
 
         self.music_pos = 0 
         
-        self.completed_games = 0
 
         # Load element animation images and scale them to 300x300
         self.animations = {
@@ -61,26 +60,6 @@ class MainMenu:
             "Fire": pygame.transform.scale(pygame.image.load("sources/images/main_menu/fire_dark.jpeg"), (300, 300))
         }
 
-
-    # def draw_menu(self):
-    #     """
-    #     Draw the main menu with animated options.
-    #     """
-    #     self.screen.fill(self.GREY)
-    #     num_rows = 2
-    #     num_cols = 2
-    #     tile_width = self.WIDTH // num_cols
-    #     tile_height = self.HEIGHT // num_rows
-    #     for i in range(num_rows):
-    #         for j in range(num_cols):
-    #             index = i * num_cols + j
-    #             option = self.options[index]
-    #             frame_index = pygame.time.get_ticks() // 400 % len(self.animations[option])  # Calculate frame index based on time
-    #             animation = self.animations[option][frame_index]  # Get current frame of animation
-    #             animation_rect = animation.get_rect(center=((j + 0.5) * tile_width, (i + 0.5) * tile_height))
-    #             self.screen.blit(animation, animation_rect)
-    #     pygame.display.update()
-
     def draw_menu(self):
         """
         Draw the main menu with animated options.
@@ -90,31 +69,29 @@ class MainMenu:
         num_cols = 2
         tile_width = self.WIDTH // num_cols
         tile_height = self.HEIGHT // num_rows
-
-        # Determine the maximum number of animations based on completed games
-        max_animations = min(self.completed_games + 1, len(self.options))
-
         for i in range(num_rows):
             for j in range(num_cols):
                 index = i * num_cols + j
-                if index < max_animations:
-                    option = self.options[index]
-                    frame_index = pygame.time.get_ticks() // 400 % len(self.animations[option])  # Calculate frame index based on time
-                    animation = self.animations[option][frame_index]  # Get current frame of animation
-                    animation_rect = animation.get_rect(center=((j + 0.5) * tile_width, (i + 0.5) * tile_height))
-                    self.screen.blit(animation, animation_rect)
+                option = self.options[index]
+                
+                # Check if the game is completed and show stable icon instead of animation
+                if option == "Air" and self.air_completed:
+                    option_icon = self.stable_icons[option]
+                elif option == "Water" and self.water_completed:
+                    option_icon = self.stable_icons[option]
+                elif option == "Earth" and self.earth_completed:
+                    option_icon = self.stable_icons[option]
+                elif option == "Fire" and self.fire_completed:
+                    option_icon = self.stable_icons[option]
                 else:
-                    option = self.options[index]
-                    stable_icon_rect = self.stable_icons[option].get_rect(center=((j + 0.5) * tile_width, (i + 0.5) * tile_height))
-                    self.screen.blit(self.stable_icons[option], stable_icon_rect)
-
+                    frame_index = pygame.time.get_ticks() // 400 % len(self.animations[option])  # Calculate frame index based on time
+                    option_icon = self.animations[option][frame_index]  # Get current frame of animation
+                
+                # Blit the icon to the screen
+                icon_rect = option_icon.get_rect(center=((j + 0.5) * tile_width, (i + 0.5) * tile_height))
+                self.screen.blit(option_icon, icon_rect)
+                
         pygame.display.update()
-
-    def handle_game_completion(self, is_completed):
-        if is_completed:
-        # Increment the completed games counter
-            self.completed_games += 1
-
 
 
     def handle_click(self, x, y):
@@ -135,42 +112,39 @@ class MainMenu:
         if index < len(self.options):
             music_pos = pygame.mixer.music.get_pos()
             selected_option = self.options[index]
-            if selected_option == "Air" and not self.flappy_aang_completed:
+            if selected_option == "Air" and not self.air_completed:
                 # pygame.mixer.Sound('sources/sounds/main_menu/air.mp3').play()
                 # pygame.time.delay(2000)
                 pygame.mixer.music.pause()
                 air_game = AirGame()
-                self.flappy_aang_completed = air_game.start()
-                self.handle_game_completion(self.flappy_aang_completed)
+                self.air_completed = air_game.start()
                 pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
                 pygame.mixer.music.play(-1, music_pos)
-            elif selected_option == "Water" and not self.maze_completed:
+            elif selected_option == "Water" and not self.water_completed:
                 # pygame.mixer.Sound('sources/sounds/main_menu/water.mp3').play()
                 # pygame.time.delay(2000)
                 pygame.mixer.music.pause()
-                maze_game = MazeGame()
-                self.maze_completed = maze_game.run()
-                self.handle_game_completion(self.maze_completed)
+                water_game = WaterGame()
+                self.water_completed = water_game.run()
                 pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
                 pygame.mixer.music.play(-1, music_pos)
-            elif selected_option == "Earth" and not self.puzzle_completed:
+            elif selected_option == "Earth" and not self.earth_completed:
                 # pygame.mixer.Sound('sources/sounds/main_menu/Earth.mp3').play()
                 # pygame.time.delay(2000)
                 pygame.mixer.music.pause()
-                puzzle_game = PuzzleGame()
-                self.puzzle_completed = puzzle_game.run()
-                self.handle_game_completion(self.puzzle_completed)
+                earth_game = EarthGame()
+                self.earth_completed = earth_game.run()
                 pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
                 pygame.mixer.music.play(-1, music_pos)
-            elif selected_option == "Fire" and not self.arrows_completed:
+            elif selected_option == "Fire" and not self.fire_completed:
                 # pygame.mixer.Sound('sources/sounds/main_menu/fire.mp3').play()
                 # pygame.time.delay(2000)
                 pygame.mixer.music.pause()
-                arrows_game = ArrowsGame()
-                self.arrows_completed = arrows_game.run()
-                self.handle_game_completion(self.arrows_completed)
+                fire_game = FireGame()
+                self.fire_completed = fire_game.run()
                 pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
                 pygame.mixer.music.play(-1, music_pos)
+            pygame.display.set_caption("Avatar: The last airbender")
 
     
     def show_intro(self):
@@ -219,7 +193,7 @@ class MainMenu:
                         x, y = pygame.mouse.get_pos()
                         self.handle_click(x, y)
                 # If all games are successfully completed, show the ending poster
-                if self.puzzle_completed and self.arrows_completed and self.maze_completed and self.flappy_aang_completed:
+                if self.air_completed and self.water_completed and self.earth_completed and self.fire_completed:
                     self.completed = True
                     pygame.mixer.music.stop()
             elif self.completed:

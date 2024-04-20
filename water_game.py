@@ -2,7 +2,7 @@ import pygame
 import random
 import sys
 
-class MazeGame:
+class WaterGame:
     """
     A class representing the 'Water - Flow Control' game.
     """
