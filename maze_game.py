@@ -50,6 +50,8 @@ class MazeGame:
         self.intro_shown = False
 
         self.clock = pygame.time.Clock()
+        
+        self.clicked = False
 
     def generate_maze(self):
         """
@@ -146,14 +148,18 @@ class MazeGame:
                     game_over = True
                     return win
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP:
+                    if event.key == pygame.K_UP and self.clicked == False:
                         keys['up'] = True
-                    elif event.key == pygame.K_DOWN:
+                        self.clicked = True
+                    elif event.key == pygame.K_DOWN and self.clicked == False:
                         keys['down'] = True
-                    elif event.key == pygame.K_LEFT:
+                        self.clicked = True
+                    elif event.key == pygame.K_LEFT and self.clicked == False:
                         keys['left'] = True
-                    elif event.key == pygame.K_RIGHT:
+                        self.clicked = True
+                    elif event.key == pygame.K_RIGHT and self.clicked == False:
                         keys['right'] = True
+                        self.clicked = True
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_UP:
                         keys['up'] = False
@@ -163,6 +169,8 @@ class MazeGame:
                         keys['left'] = False
                     elif event.key == pygame.K_RIGHT:
                         keys['right'] = False
+            pygame.time.delay(50)
+            self.clicked = False
 
             if keys['up'] and player_y - self.PLAYER_SPEED > 0 and maze[player_y - self.PLAYER_SPEED][player_x] == 0:
                 player_y -= self.PLAYER_SPEED
