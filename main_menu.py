@@ -3,6 +3,7 @@ import sys
 from puzzle_game import PuzzleGame
 from arrows_game import ArrowsGame
 from maze_game import MazeGame
+from air import AirGame
 
 class MainMenu:
     """
@@ -91,22 +92,36 @@ class MainMenu:
         if index < len(self.options):
             music_pos = pygame.mixer.music.get_pos()
             selected_option = self.options[index]
-            if selected_option == "Earth" and not self.puzzle_completed:
+            if selected_option == "Air" and not self.flappy_aang_completed:
+                pygame.mixer.Sound('sources/sounds/main_menu/air.mp3').play()
+                pygame.time.delay(2000)
+                pygame.mixer.music.pause()
+                air_game = AirGame()
+                self.flappy_aang_completed = air_game.start()
+                pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
+                pygame.mixer.music.play(-1, music_pos)
+            elif selected_option == "Water" and not self.maze_completed:
+                pygame.mixer.Sound('sources/sounds/main_menu/water.mp3').play()
+                pygame.time.delay(2000)
+                pygame.mixer.music.pause()
+                maze_game = MazeGame()
+                self.maze_completed = maze_game.run()
+                pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
+                pygame.mixer.music.play(-1, music_pos)
+            elif selected_option == "Earth" and not self.puzzle_completed:
+                pygame.mixer.Sound('sources/sounds/main_menu/Earth.mp3').play()
+                pygame.time.delay(2000)
                 pygame.mixer.music.pause()
                 puzzle_game = PuzzleGame()
                 self.puzzle_completed = puzzle_game.run()
                 pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
                 pygame.mixer.music.play(-1, music_pos)
             elif selected_option == "Fire" and not self.arrows_completed:
+                pygame.mixer.Sound('sources/sounds/main_menu/fire.mp3').play()
+                pygame.time.delay(2000)
                 pygame.mixer.music.pause()
                 arrows_game = ArrowsGame()
                 self.arrows_completed = arrows_game.run()
-                pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
-                pygame.mixer.music.play(-1, music_pos)
-            elif selected_option == "Water" and not self.maze_completed:
-                pygame.mixer.music.pause()
-                maze_game = MazeGame()
-                self.maze_completed = maze_game.run()
                 pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
                 pygame.mixer.music.play(-1, music_pos)
 
@@ -117,7 +132,9 @@ class MainMenu:
         """
         # Display the intro only if it has not been displayed yet
         if not self.intro_shown:
-            pygame.mixer.Sound('sources/sounds/main_menu/intro.mp3').play()
+            intro = pygame.mixer.Sound('sources/sounds/main_menu/intro.mp3')
+            intro.play()
+            intro.set_volume(0.4)
             intro_image = pygame.transform.scale(pygame.image.load("sources/images/main_menu/intro1.jpeg"), (600, 600))
             self.screen.blit(intro_image, (0, 0))
             pygame.display.update()
@@ -155,7 +172,7 @@ class MainMenu:
                         x, y = pygame.mouse.get_pos()
                         self.handle_click(x, y)
                 # If all games are successfully completed, show the ending poster
-                if self.puzzle_completed and self.arrows_completed and self.maze_completed:
+                if self.puzzle_completed and self.arrows_completed and self.maze_completed and self.flappy_aang_completed:
                     self.completed = True
                     pygame.mixer.music.stop()
             elif self.completed:
