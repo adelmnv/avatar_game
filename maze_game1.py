@@ -31,7 +31,7 @@ class MazeGame:
 
         # Create window
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
-        pygame.display.set_caption("Лабиринт")
+        pygame.display.set_caption("Water - Flow Control")
 
         # Background image
         self.background = pygame.image.load("sources/images/water/maze_background.jpeg")
@@ -40,6 +40,8 @@ class MazeGame:
         # Load background music
         pygame.mixer.music.load("sources/sounds/water/maze_music.mp3")
         pygame.mixer.music.play(-1)
+
+        self.intro_shown = False
 
         self.clock = pygame.time.Clock()
 
@@ -83,6 +85,21 @@ class MazeGame:
         pygame.draw.circle(self.screen, self.GREEN, (self.CELL_SIZE + self.CELL_SIZE // 2, self.CELL_SIZE + self.CELL_SIZE // 2), self.CELL_SIZE // 2)
         pygame.draw.circle(self.screen, self.RED, ((self.GRID_WIDTH - 3) * self.CELL_SIZE + self.CELL_SIZE // 2, (self.GRID_HEIGHT - 3) * self.CELL_SIZE + self.CELL_SIZE // 2), self.CELL_SIZE // 2)
 
+    def show_intro(self):
+        # Display the intro only if it has not been displayed yet
+        if not self.intro_shown:
+            intro_image = pygame.transform.scale(pygame.image.load("sources/images/water/water_intro.jpg"), (600, 600))
+            self.screen.blit(intro_image, (0, 0))
+            pygame.display.update()
+            intro_done = False
+            while not intro_done:
+                for event in pygame.event.get():
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                        intro_done = True
+                pygame.time.Clock().tick(30)  # Adjust as needed
+
+            self.intro_shown = True
+
     def run(self):
         maze = self.generate_maze()
         player_x = 1
@@ -91,7 +108,7 @@ class MazeGame:
         player_path = []
         game_over = False
         win = False
-
+        self.show_intro()
         while not game_over:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
