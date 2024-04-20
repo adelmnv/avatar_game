@@ -12,6 +12,7 @@ class AirGame:
         #screen
         self.W, self.H = 600, 600
         self.screen = pygame.display.set_mode((self.W, self.H))
+        pygame.display.set_caption("Air - The Flight of the Wind")
         #fps
         self.fps = 60
         self.clock = pygame.time.Clock()

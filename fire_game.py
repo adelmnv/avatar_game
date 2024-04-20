@@ -3,7 +3,7 @@ import sys
 import os
 import random
 
-class ArrowsGame:
+class FireGame:
     """
     A class representing the 'Fire - The Dancing Dragon' game.
     """

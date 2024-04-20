@@ -2,7 +2,7 @@ import pygame
 import sys
 import random
 
-class PuzzleGame:
+class EarthGame:
     """
     A class representing the 'Earth - Stone Mosaic' puzzle game.
     """
@@ -182,8 +182,8 @@ class PuzzleGame:
                                 # count+=1 #
                                 if all(self.tiles[i] == i for i in range(len(self.tiles))):
                                     self.solved = True
-                                #if count == 1: #
-                                    #self.solved = True #
+                                # if count == 1: #
+                                    # self.solved = True #
 
             # Drawing the background
             self.screen.blit(self.background, (0, 0))
