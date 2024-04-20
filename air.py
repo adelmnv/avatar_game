@@ -57,10 +57,16 @@ class AirGame:
         self.music = pygame.mixer.music.load('sources/sounds/air/air.mp3')
         pygame.mixer.music.play(-1)
         pygame.mixer.music.set_volume(0.2) 
+        #is_passed
+        self.running = True
+        self.solved = False
     
     class Player(pygame.sprite.Sprite):
         """A class representing the player"""
         def __init__(self,game_instance, x, y,H):
+            """
+            
+            """
             super().__init__()
             self.game_instance = game_instance
             self.images = []
@@ -155,12 +161,12 @@ class AirGame:
 
     def start(self):
         """Start the game"""
-        running = True
-        while running:
+        self.running = True
+        while self.running:
             menu_input = self.handle_menu()
             if menu_input is not None:
                 if menu_input:
-                    running = False
+                    self.running = False
                 else:
                     pygame.quit()
                     return
@@ -168,45 +174,37 @@ class AirGame:
             self.draw_menu()
             pygame.display.flip()
             self.clock.tick(self.fps)
-
-        self.run_game()
+        self.solved = self.run_game()
+        return self.solved
+    
     def game_over_menu(self):
-        music = pygame.mixer.music.load('sources/sounds/air/lose_menu.mp3')
-        pygame.mixer.music.play(-1)
-        pygame.mixer.music.set_volume(0.5)
-        while True:
-            self.screen.fill('Black')
-            self.lose_text = self.lose_font.render('You almost there',False,'SkyBlue')
-            self.current_score = self.number_of_runes_font.render(f'Your score: {self.runes_collection}',False,'SkyBlue')
-            self.screen.blit(self.lose_text,(self.W//2-180,250))
-            self.screen.blit(self.current_score,(self.W//2-100,320))
-            for event in pygame.event.get():
-                if event.type == pygame.K_BACKSPACE:
-                    return False
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    return
-            pygame.display.flip()
+        pygame.mixer.music.stop()
+        pygame.mixer.Sound(('sources/sounds/air/lose_menu.mp3')).play(1)
+        self.screen.fill('Black')
+        self.lose_text = self.lose_font.render('You almost there',False,'SkyBlue')
+        self.current_score = self.number_of_runes_font.render(f'Your score: {self.runes_collection}',False,'SkyBlue')
+        self.screen.blit(self.lose_text,(self.W//2-180,250))
+        self.screen.blit(self.current_score,(self.W//2-100,320))
+        pygame.display.flip()
+        pygame.time.delay(5000)
+        return None
+     
     def win_game_menu(self):
-        self.music = pygame.mixer.music.load('sources/sounds/air/win_menu.mp3')
-        pygame.mixer.music.play(-1)
-        while True:
-            self.screen.fill('Black')
-            self.win_text = self.win_font.render('Congratulations!',False,'Gold')
-            self.win_text2 = self.win_font2.render('You have mastered the air',False,'Gold')
-            self.screen.blit(self.win_text,(self.W//2-180,250))
-            self.screen.blit(self.win_text2,(self.W//2-150,320))
-            for event in pygame.event.get():
-                if event.type == pygame.K_BACKSPACE:
-                    return True
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    return
-            pygame.display.flip()
+        pygame.mixer.music.stop()
+        pygame.mixer.Sound(('sources/sounds/air/win_menu.mp3')).play(1)
+        self.screen.fill('Black')
+        self.win_text = self.win_font.render('Congratulations!',False,'Gold')
+        self.win_text2 = self.win_font2.render('You have mastered the air',False,'Gold')
+        self.screen.blit(self.win_text,(self.W//2-180,250))
+        self.screen.blit(self.win_text2,(self.W//2-150,320))
+        pygame.display.flip()
+        pygame.time.delay(5000)
+        return None
     
     def run_game(self):
         """Run the game"""
-        while True:
+        self.running = True
+        while self.running:
             if self.game_over == False and self.game_win == False:
 
                 self.screen.blit(self.background_image_of_game, (self.background_x, 0))
@@ -270,16 +268,24 @@ class AirGame:
                     self.game_win = True
                     self.flying = False
             if self.game_over == True:
-                self.game_over = self.game_over_menu()
+                self.game_over = False
+                self.ruunning = False
+                self.game_over_menu()
+                self.solved = False
+                return self.solved
             if self.game_win == True:
-                self.game_win = self.win_game_menu()
+                self.game_win = False
+                self.running = False
+                self.win_game_menu()
+                self.solved = True
+                return self.solved
             pygame.display.flip()
             self.clock.tick(self.fps)
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    return
+                    self.passed = False
+                    return self.passed
                 if event.type == pygame.MOUSEBUTTONDOWN and self.flying == False and self.game_over == False:
                     self.flying = True 
 
