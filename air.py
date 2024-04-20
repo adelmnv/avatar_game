@@ -1,5 +1,6 @@
 import pygame
 from random import randint
+from time import sleep
 
 class AirGame:
     """A class representing an air game"""
@@ -87,10 +88,11 @@ class AirGame:
                 if self.rect.bottom < self.H:
                     self.rect.y += int(self.velocity)
             if not self.game_instance.game_over:
-                if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False and self.rect.top-self.rect.height+6 > 0:
+                key = pygame.key.get_pressed()
+                if key[pygame.K_SPACE] and self.clicked == False and self.rect.top-self.rect.height+6 > 0:
                     self.clicked = True
                     self.velocity = -9
-                if pygame.mouse.get_pressed()[0] == 0:
+                if key[pygame.K_SPACE] == 0:
                     self.clicked = False
                 if self.game_instance.flying:
                     COOLDOWN = 10
@@ -136,38 +138,6 @@ class AirGame:
             if self.rect.right < 0:
                 self.kill()
     
-    def draw_menu(self):
-        """Draw the menu screen"""
-        self.screen.blit(self.background_image_of_menu, (0, 0))
-        pygame.display.flip()
-
-    def handle_menu(self):
-        """Handle menu input"""
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    return True
-            
-        return None
-
-    def start(self):
-        """Start the game"""
-        self.running = True
-        while self.running:
-            menu_input = self.handle_menu()
-            if menu_input is not None:
-                if menu_input:
-                    self.running = False
-                else:
-                    pygame.quit()
-                    return
-
-            self.draw_menu()
-            pygame.display.flip()
-            self.clock.tick(self.fps)
-        self.solved = self.run_game()
-        return self.solved
-    
     def game_over_menu(self):
         pygame.mixer.music.stop()
         pygame.mixer.Sound(('sources/sounds/air/lose_menu.mp3')).play(1)
@@ -177,7 +147,7 @@ class AirGame:
         self.screen.blit(self.lose_text,(self.W//2-180,250))
         self.screen.blit(self.current_score,(self.W//2-100,320))
         pygame.display.flip()
-        pygame.time.delay(5000)
+        sleep(5)
         pygame.mixer.stop()
         return None
      
@@ -279,13 +249,45 @@ class AirGame:
                 if event.type == pygame.QUIT:
                     self.passed = False
                     return self.passed
-                if event.type == pygame.MOUSEBUTTONDOWN and self.flying == False and self.game_over == False:
-                    self.flying = True
-                    #music
-                    self.music = pygame.mixer.music.load('sources/sounds/air/air.mp3')
-                    pygame.mixer.music.play(-1)
-                    pygame.mixer.music.set_volume(0.2)  
+                if event.type == pygame.KEYDOWN and self.flying == False and self.game_over == False:
+                    if event.key == pygame.K_SPACE:
+                        self.flying = True
+                        #music
+                        self.music = pygame.mixer.music.load('sources/sounds/air/air.mp3')
+                        pygame.mixer.music.play(-1)
+                        pygame.mixer.music.set_volume(0.2)  
+    def draw_menu(self):
+        """Draw the menu screen"""
+        self.screen.blit(self.background_image_of_menu, (0, 0))
+        pygame.display.flip()
 
+    def handle_menu(self):
+        """Handle menu input"""
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    return True
+            
+        return None
+
+    def start(self):
+        """Start the game"""
+        self.running = True
+        while self.running:
+            menu_input = self.handle_menu()
+            if menu_input is not None:
+                if menu_input:
+                    self.running = False
+                else:
+                    pygame.quit()
+                    return
+
+            self.draw_menu()
+            pygame.display.flip()
+            self.clock.tick(self.fps)
+        self.solved = self.run_game()
+        return self.solved
+    
 #start game
 if __name__ == "__main__":
     game = AirGame()
