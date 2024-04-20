@@ -76,7 +76,7 @@ class ArrowsGame:
                 for event in pygame.event.get():
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                         intro_done = True
-                pygame.time.Clock().tick(30)  # Adjust as needed
+                pygame.time.Clock().tick(30)
             
             intro_sound.stop()
             self.intro_shown = True
