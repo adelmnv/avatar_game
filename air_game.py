@@ -77,19 +77,18 @@ class AirGame:
             self.rect = self.image.get_rect(center=(x, y))
             self.mask = pygame.mask.from_surface(self.image)
             self.velocity = 0
-            self.clicked = False
 
         def update(self):
             """Update the player's position and animation"""
+            if not self.game_instance.game_over:
+                key = pygame.key.get_pressed()
+                if key[pygame.K_SPACE] and self.rect.top - 35 > 0:
+                    self.velocity = -6.5
             if self.game_instance.flying:
                 self.velocity += 0.5
                 if self.velocity > 8:
                     self.velocity = 8
                 self.rect.y += int(self.velocity)
-            if not self.game_instance.game_over:
-                key = pygame.key.get_pressed()
-                if key[pygame.K_SPACE] and self.rect.top - 50 > 0:
-                    self.velocity = -6.5
                 if self.game_instance.flying:
                     COOLDOWN = 10
                     self.counter += 1
@@ -100,6 +99,7 @@ class AirGame:
                             self.index = 0
                     self.image = self.images[self.index]
                     self.image = pygame.transform.rotate(self.image, self.velocity*-1)
+                    self.mask = pygame.mask.from_surface(self.image)
 
     class Cloud(pygame.sprite.Sprite):
         """A class representing a cloud"""
@@ -182,6 +182,10 @@ class AirGame:
             for rune in self.runes_group:
                 if pygame.sprite.spritecollide(rune,self.clouds_group,True,pygame.sprite.collide_mask): #deleting the cloud if collided with rune
                     pass
+        #check if hit the ground
+        if self.player.rect.bottom >= self.H: 
+            self.game_over = True #lose
+            self.flying = False
     
     def run_game(self):
         """Run the game"""
@@ -270,6 +274,8 @@ class AirGame:
     def start(self):
         """Start the game"""
         self.running = True
+        pygame.mixer.music.load('sources/sounds/air/air_menu.mp3')
+        pygame.mixer.music.play(1)
         while self.running:
             menu_input = self.handle_menu()
             if menu_input is not None:
@@ -282,6 +288,7 @@ class AirGame:
             self.draw_menu()
             pygame.display.flip()
             self.clock.tick(self.fps)
+        pygame.mixer.music.stop()
         self.solved = self.run_game()
         return self.solved
     
