@@ -107,7 +107,8 @@ class MainMenu:
                 self.screen.blit(option_icon, icon_rect)
         mouse_pos = pygame.mouse.get_pos()
         img_of_cursor = pygame.transform.scale(pygame.image.load("sources/images/main_menu/mouse_cursor.png").convert_alpha(),(30,40))
-        self.screen.blit(img_of_cursor, mouse_pos)        
+        if 0 < mouse_pos[0] < self.WIDTH and 0 < mouse_pos[1] < self.HEIGHT:
+            self.screen.blit(img_of_cursor, mouse_pos)        
         pygame.display.update()
 
 
