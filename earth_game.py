@@ -31,7 +31,7 @@ class EarthGame:
 
         self.running = True
         self.solved = False
-
+        
         self.intro_shown = False
 
         pygame.mixer.music.load('sources/sounds/earth/puzzle_soundtrack.mp3')

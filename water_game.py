@@ -212,7 +212,7 @@ class WaterGame:
         self.screen.blit(game_over_text, text_rect)
         pygame.display.flip()
 
-        pygame.time.delay(1000)
+        pygame.time.delay(2000)
 
         return win
 

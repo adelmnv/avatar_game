@@ -180,7 +180,7 @@ class FireGame:
                 pygame.mixer.music.stop()
                 pygame.mixer.Sound('sources/sounds/fire/dragon_dance_loose.mp3').play()
                 self._display_message("Wrong, you haven't mastered fire.")
-                pygame.time.delay(1000)
+                pygame.time.delay(3000)
                 pygame.mixer.music.stop()
                 self.running = False
                 return self.solved
