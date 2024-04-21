@@ -17,7 +17,7 @@ class AirGame:
         self.fps = 60
         self.clock = pygame.time.Clock()
         #background images
-        self.background_image_of_menu = pygame.transform.scale(pygame.image.load('sources/images/air/air_menu.jpg').convert_alpha(), (self.W, self.H))
+        self.background_image_of_menu = pygame.transform.scale(pygame.image.load('sources/images/air/air_menu.png').convert_alpha(), (self.W, self.H))
         self.background_image_of_game = pygame.transform.scale(pygame.image.load('sources/images/air/air_background.png').convert_alpha(), (self.W, self.H))
         self.background_x = 0
         #game variables
