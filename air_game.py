@@ -12,7 +12,6 @@ class AirGame:
         #screen
         self.W, self.H = 600, 600
         self.screen = pygame.display.set_mode((self.W, self.H))
-        pygame.display.set_caption("Air - The Flight of the Wind")
         #fps
         self.fps = 60
         self.clock = pygame.time.Clock()
@@ -84,17 +83,13 @@ class AirGame:
             """Update the player's position and animation"""
             if self.game_instance.flying:
                 self.velocity += 0.5
-                if self.velocity > 9:
-                    self.velocity = 9
-                if self.rect.bottom < self.H:
-                    self.rect.y += int(self.velocity)
+                if self.velocity > 8:
+                    self.velocity = 8
+                self.rect.y += int(self.velocity)
             if not self.game_instance.game_over:
                 key = pygame.key.get_pressed()
-                if key[pygame.K_SPACE] and self.clicked == False and self.rect.top-self.rect.height+6 > 0:
-                    self.clicked = True
-                    self.velocity = -9
-                if key[pygame.K_SPACE] == 0:
-                    self.clicked = False
+                if key[pygame.K_SPACE] and self.rect.top - 50 > 0:
+                    self.velocity = -6.5
                 if self.game_instance.flying:
                     COOLDOWN = 10
                     self.counter += 1
@@ -148,7 +143,7 @@ class AirGame:
         self.screen.blit(self.lose_text,(self.W//2-180,250))
         self.screen.blit(self.current_score,(self.W//2-100,320))
         pygame.display.flip()
-        sleep(5)
+        pygame.time.delay(5000)
         pygame.mixer.stop()
         return None
      
@@ -165,48 +160,48 @@ class AirGame:
         pygame.mixer.stop()
         return None
     
+    def updating_groups(self):
+        self.player_group.draw(self.screen)
+        self.player_group.update()
+        self.clouds_group.draw(self.screen)
+        self.clouds_group.update()
+        self.runes_group.draw(self.screen)
+        self.runes_group.update()
+    
+    def collision_check(self):
+        #mask collision
+        if pygame.sprite.spritecollide(self.player,self.clouds_group,False,pygame.sprite.collide_mask): #collision with clouds
+            self.game_over = True 
+        if pygame.sprite.spritecollide(self.player,self.runes_group,True,pygame.sprite.collide_mask): #collision with runes
+            pygame.mixer.Channel(0).play(pygame.mixer.Sound('sources/sounds/air/collected_rune.mp3'), maxtime=500) #catch the rune
+            self.runes_collection += 1
+            self.runes_collected_list.append(self.rune_index) #adding the index of which rune was collected
+            self.last_collected_run_time = 35
+        #checking for not be on top of each other
+        if len(self.runes_group) > 0:
+            for rune in self.runes_group:
+                if pygame.sprite.spritecollide(rune,self.clouds_group,True,pygame.sprite.collide_mask): #deleting the cloud if collided with rune
+                    pass
+    
     def run_game(self):
         """Run the game"""
         self.running = True
         while self.running:
             if self.game_over == False and self.game_win == False:
-
                 self.screen.blit(self.background_image_of_game, (self.background_x, 0))
                 self.screen.blit(self.background_image_of_game, (self.background_x+600, 0))
                 if self.flying == True:
                     self.background_x -= 1
                     if self.background_x <= -600:
                         self.background_x = 0
-
-                self.player_group.draw(self.screen)
-                self.player_group.update()
-                
-                self.clouds_group.draw(self.screen)
-                self.clouds_group.update()
-
-                self.runes_group.draw(self.screen)
-                self.runes_group.update()
-                
+                #updating groups
+                self.updating_groups()
                 #collected runes text
                 self.number_of_runes_text = self.number_of_runes_font.render(f'Collected runes: {self.runes_collection}',False,'Green') #collected runes text
                 self.screen.blit(self.number_of_runes_text,(self.W//2-300//2,10))
-                #mask collision
-                if pygame.sprite.spritecollide(self.player,self.clouds_group,False,pygame.sprite.collide_mask): #collision with clouds
-                    self.game_over = True 
-                if pygame.sprite.spritecollide(self.player,self.runes_group,True,pygame.sprite.collide_mask): #collision with runes
-                    pygame.mixer.Channel(0).play(pygame.mixer.Sound('sources/sounds/air/collected_rune.mp3'), maxtime=500) #catch the rune
-                    self.runes_collection += 1
-                    self.runes_collected_list.append(self.rune_index) #adding the index of which rune was collected
-                    self.last_collected_run_time = 35
-                #checking for not be on top of each other
-                if len(self.runes_group) > 0:
-                    for rune in self.runes_group:
-                        if pygame.sprite.spritecollide(rune,self.clouds_group,True,pygame.sprite.collide_mask): #deleting the cloud if collided with rune
-                            pass
-                #check if hit the ground
-                if self.player.rect.bottom >= self.H: 
-                    self.game_over = True #lose
-                    self.flying = False
+                #collision check
+                self.collision_check()
+                #spawn clouds and runes
                 if self.flying == True:
                     time_now = pygame.time.get_ticks()
                     #cloud spawn
@@ -228,7 +223,8 @@ class AirGame:
                         self.last_collected_run_time -= 1
                         self.collected_rune_text = self.collected_rune_font.render(f'Collected rune {self.runes_name[self.rune_index]}',False,'Yellow') #collected rune text
                         self.screen.blit(self.collected_rune_text,(self.W-250,60))
-                if self.runes_collection == 7: #win game
+                #win game
+                if self.runes_collection == 7:
                     self.game_win = True
                     self.flying = False
             if self.game_over == True:
