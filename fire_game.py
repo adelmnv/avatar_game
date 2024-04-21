@@ -235,5 +235,5 @@ class FireGame:
                     
 # Check if the script is being run as the main program
 if __name__ == "__main__":
-    game = ArrowsGame()
+    game = FireGame()
     game.run()
