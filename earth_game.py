@@ -21,9 +21,24 @@ class EarthGame:
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
         pygame.display.set_caption("Earth - Stone Mosaic")
 
-        # Uploading an image for a puzzle and breaking it into pieces
-        self.tiles = self._load_and_split_image("sources/images/earth/pazzle-earth.png", self.WIDTH, self.HEIGHT)
+        # Uploading an image for a puzzle and breaking it into pieces (original sequence, current sequence)
+        self.original_tiles = self.tiles = self._load_and_split_image("sources/images/earth/pazzle-earth.png", self.WIDTH, self.HEIGHT)
+        
+        # Updating original_tiles (last element shoulb be empty)
+        self.original_tiles = self.original_tiles[:-1]
+        self.original_tiles.append(None)
+        
+        # Create a list with the correct order of tiles with None since the last tile should be empty
+        self.correct_order = list(range(self.ROWS * self.COLS-1))
+        self.correct_order.append(None)
+
+        # Initialize an empty list to store the current order of tiles
+        self.current_order = []
+
+        # Shuffle the tiles
         self.tiles = self._shuffle_tiles(self.tiles)
+
+        # Determine the index of the empty space
         self.empty_index = self.tiles.index(None)
 
         # Uploading an image for the background
@@ -95,15 +110,42 @@ class EarthGame:
             list: The shuffled list of puzzle tiles.
         """
         # Exclude the last (empty) piece from mixing
+        original_tiles = tiles[:-1]
         shuffled_tiles = tiles[:-1]
 
-         # Shuffle the non-empty tiles randomly
+        # Shuffle the non-empty tiles randomly
         random.shuffle(shuffled_tiles)
 
+        # Calculate the number of inversions in the shuffled tiles
+        inversions = 0
+        for i in range(len(shuffled_tiles)):
+            for j in range(i + 1, len(shuffled_tiles)):
+                if shuffled_tiles[i] is not None and shuffled_tiles[j] is not None and original_tiles.index(shuffled_tiles[i]) > original_tiles.index(shuffled_tiles[j]):
+                    inversions += 1
+
+        # If the number of inversions is odd, swap two random tiles to make it even
+        if inversions % 2 != 0:
+            while True:
+                # Randomly select two distinct indices
+                index1, index2 = random.sample(range(len(shuffled_tiles)), 2)
+                # Swap the tiles
+                shuffled_tiles[index1], shuffled_tiles[index2] = shuffled_tiles[index2], shuffled_tiles[index1]
+                # Recalculate the number of inversions
+                inversions = sum(1 for i in range(len(shuffled_tiles)) for j in range(i + 1, len(shuffled_tiles)) if shuffled_tiles[i] is not None and shuffled_tiles[j] is not None and original_tiles.index(shuffled_tiles[i]) > original_tiles.index(shuffled_tiles[j]))
+                # If the number of inversions becomes even, break the loop
+                if inversions % 2 == 0:
+                    break
+
         # Add an empty piece to the end
+        original_tiles.append(None)
         shuffled_tiles.append(None) 
 
+        # Update the current order after the tile swap
+        self.current_order = [original_tiles.index(tile) if tile is not None else None for tile in shuffled_tiles]
+
         return shuffled_tiles
+
+
 
     def _draw_tiles(self):
         """
@@ -118,17 +160,19 @@ class EarthGame:
                 # Displaying the current tile on the screen
                 self.screen.blit(tile, (x, y))
 
+
     def _handle_click(self, row, col):
         """
         Handle a click on a puzzle tile.
-        Firstly, checking if the clicked tile is adjacent to the empty tile,
-        if yes swapping the clicked tile with the empty tile
 
         Args:
             row (int): The row index of the clicked tile.
             col (int): The column index of the clicked tile.
         """
+        # Calculate the index of the clicked tile
         index = row * self.COLS + col
+
+        # Check if the clicked tile is adjacent to the empty tile and swap if yes
         if index - self.COLS == self.empty_index:
             self.tiles[index], self.tiles[self.empty_index] = self.tiles[self.empty_index], self.tiles[index]
         elif index + self.COLS == self.empty_index:
@@ -137,6 +181,12 @@ class EarthGame:
             self.tiles[index], self.tiles[self.empty_index] = self.tiles[self.empty_index], self.tiles[index]
         elif (index + 1) % self.COLS != 0 and index + 1 == self.empty_index:
             self.tiles[index], self.tiles[self.empty_index] = self.tiles[self.empty_index], self.tiles[index]
+        
+        # Update the current order after the tile swap
+        self.current_order = [self.original_tiles.index(tile) if tile is not None else None for tile in self.tiles]
+        
+        # Print the current order for debugging purposes
+        # print(self.current_order)
 
     def _display_congratulations(self):
         """
@@ -193,7 +243,6 @@ class EarthGame:
         Returns:
             bool: True if the player wins, False otherwise.
         """
-        # count = 0 # test (to end fast) needed for testing game
 
         # Start playing the background music
         pygame.mixer.music.play(-1)
@@ -230,14 +279,9 @@ class EarthGame:
                                 self._handle_click(row, col)
                                 self.empty_index = self.tiles.index(None)
 
-                                # count+=1 # test val
-
-                                # Check if the puzzle is solved
-                                if all(self.tiles[i] == i for i in range(len(self.tiles))):
-                                    self.solved = True
-
-                                # if count == 1: # test val
-                                    # self.solved = True # test val
+                # Check if the puzzle is solved
+                if self.current_order == self.correct_order:
+                    self.solved = True
 
             # Drawing the background
             self.screen.blit(self.background, (0, 0))

@@ -25,7 +25,7 @@ class MainMenu:
         
         # Create window
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
-        pygame.display.set_caption("Avatar: The last airbender")
+        pygame.display.set_caption("Avatar: The Last Airbender")
         
         # Menu options
         self.options = ["Air", "Water", "Earth", "Fire"]
@@ -167,7 +167,7 @@ class MainMenu:
                 pygame.mixer.music.load('sources/sounds/main_menu/menu.mp3')
                 pygame.mixer.music.play(-1, music_pos)
 
-            pygame.display.set_caption("Avatar: The last airbender")
+            pygame.display.set_caption("Avatar: The Last Airbender")
 
     
     def show_intro(self):
