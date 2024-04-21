@@ -29,11 +29,15 @@ class EarthGame:
         # Uploading an image for the background
         self.background = self._load_image("sources/images/earth/pazzle-earth_dark.png", self.WIDTH, self.HEIGHT)
 
-        self.running = True
+        # flags
+        # flag for game loop
+        self.running = True 
+        # flag if puzzle solved
         self.solved = False
-        
+        # flag if intro shown
         self.intro_shown = False
 
+        # load game soundtrack
         pygame.mixer.music.load('sources/sounds/earth/puzzle_soundtrack.mp3')
 
     def _load_image(self, image_path, width, height):
@@ -65,12 +69,17 @@ class EarthGame:
             list: A list of pygame.Surfaces, each representing a puzzle tile.
         """
         image = self._load_image(image_path, width, height)
+        # Calculate the width and height of each tile
         tile_width = image.get_width() // self.COLS
         tile_height = image.get_height() // self.ROWS
+
         tiles = []
+        # Iterate over rows and columns to split the image into tiles
         for y in range(self.ROWS):
             for x in range(self.COLS):
+                # Create a rectangle representing the current tile
                 rect = pygame.Rect(x * tile_width, y * tile_height, tile_width, tile_height)
+                # Extract the tile from the image
                 tile = image.subsurface(rect)
                 tiles.append(tile)
         return tiles
@@ -85,9 +94,15 @@ class EarthGame:
         Returns:
             list: The shuffled list of puzzle tiles.
         """
-        shuffled_tiles = tiles[:-1]  # Exclude the last (empty) piece from mixing
+        # Exclude the last (empty) piece from mixing
+        shuffled_tiles = tiles[:-1]
+
+         # Shuffle the non-empty tiles randomly
         random.shuffle(shuffled_tiles)
-        shuffled_tiles.append(None)  # Add an empty piece to the end
+
+        # Add an empty piece to the end
+        shuffled_tiles.append(None) 
+
         return shuffled_tiles
 
     def _draw_tiles(self):
@@ -96,13 +111,18 @@ class EarthGame:
         """
         for i, tile in enumerate(self.tiles):
             if tile is not None:
+                # Calculating the row and column index for the current tile
                 row, col = i // self.COLS, i % self.COLS
+                # Calculating the (x, y) coordinates to display the current tile
                 x, y = col * self.TILE_SIZE, row * self.TILE_SIZE
+                # Displaying the current tile on the screen
                 self.screen.blit(tile, (x, y))
 
     def _handle_click(self, row, col):
         """
         Handle a click on a puzzle tile.
+        Firstly, checking if the clicked tile is adjacent to the empty tile,
+        if yes swapping the clicked tile with the empty tile
 
         Args:
             row (int): The row index of the clicked tile.
@@ -122,14 +142,26 @@ class EarthGame:
         """
         Display a message congratulating the player for solving the puzzle.
         """
+        # Selecting the font and size for the message
         font = pygame.font.SysFont('Papyrus', 36)
+
+        # Creating the message text and text surface
         text = font.render("You've managed to master earth!", True, (0, 0, 0))
+
+        # Getting the rectangle that surrounds the text to center it on the screen
         text_rect = text.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2))
-        background_rect = text_rect.inflate(20, 20)  #Enlarging the rectangle for filling
-        pygame.draw.rect(self.screen, (71, 107, 4), background_rect)  #Fill the rectangle with color
-        self.screen.blit(text, text_rect)  #Drawing the text
-        pygame.display.update()  #Updating the screen to display text and fill
+
+        # Enlarging the rectangle to add padding for the background color
+        background_rect = text_rect.inflate(20, 20)
+
+        #Fill the rectangle with color 
+        pygame.draw.rect(self.screen, (71, 107, 4), background_rect)  
+
+        self.screen.blit(text, text_rect)
+        pygame.display.update()
         pygame.time.delay(2000)
+        
+        # Setting the 'running' flag to False to end the game loop
         self.running = False
 
     def show_intro(self):
@@ -138,16 +170,20 @@ class EarthGame:
         """
         # Display the intro only if it has not been displayed yet
         if not self.intro_shown:
+            # Load and scale the intro image
             intro_image = pygame.transform.scale(pygame.image.load("sources/images/earth/earth_intro.jpg"), (600, 600))
+            # Display the intro image on the screen
             self.screen.blit(intro_image, (0, 0))
             pygame.display.update()
+            # Wait for the user to press the Enter key to continue
             intro_done = False
             while not intro_done:
                 for event in pygame.event.get():
                     if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                         intro_done = True
-                pygame.time.Clock().tick(30)  # Adjust as needed
+                pygame.time.Clock().tick(30)
 
+            # Mark the intro as shown
             self.intro_shown = True
 
     def run(self):
@@ -157,33 +193,51 @@ class EarthGame:
         Returns:
             bool: True if the player wins, False otherwise.
         """
-        # count = 0 # test (to end fast)
+        # count = 0 # test (to end fast) needed for testing game
+
+        # Start playing the background music
         pygame.mixer.music.play(-1)
+        # Show the game introduction
         self.show_intro()
+        # Main game loop
         while self.running:
+            # Event handling loop
             for event in pygame.event.get():
+                # Quit event handling
                 if event.type == pygame.QUIT:
                     pygame.mixer.music.stop()
                     self.running = False
                     return self.solved
+                # Mouse click event handling
                 elif event.type == pygame.MOUSEBUTTONDOWN and not self.solved:
                     if pygame.mouse.get_pressed()[0]:
+                        # Get the row and column indices of the clicked tile
                         x, y = pygame.mouse.get_pos()
                         col = x // self.TILE_SIZE
                         row = y // self.TILE_SIZE
+                        # Handle the click if it's within the puzzle grid
                         if 0 <= row < self.ROWS and 0 <= col < self.COLS:
                             index = row * self.COLS + col
+
+                            # Check if the clicked tile is adjacent to the empty tile
                             if index - self.COLS == self.empty_index or index + self.COLS == self.empty_index or \
                                (index % self.COLS != 0 and index - 1 == self.empty_index) or \
                                ((index + 1) % self.COLS != 0 and index + 1 == self.empty_index):
+                                # Play the move sound effect
                                 pygame.mixer.Sound('sources/sounds/earth/move.mp3').play()
+
+                                # Handle the click (move the tile)
                                 self._handle_click(row, col)
                                 self.empty_index = self.tiles.index(None)
-                                # count+=1 #
+
+                                # count+=1 # test val
+
+                                # Check if the puzzle is solved
                                 if all(self.tiles[i] == i for i in range(len(self.tiles))):
                                     self.solved = True
-                                # if count == 1: #
-                                    # self.solved = True #
+
+                                # if count == 1: # test val
+                                    # self.solved = True # test val
 
             # Drawing the background
             self.screen.blit(self.background, (0, 0))
@@ -191,7 +245,7 @@ class EarthGame:
             # Drawing the puzzle pieces
             self._draw_tiles()
 
-            # If the puzzle is assembled, we display congratulations
+            # If the puzzle is solved, we display congratulations
             if self.solved:
                 self._display_congratulations()
                 pygame.mixer.music.stop()
@@ -199,6 +253,7 @@ class EarthGame:
                 
             pygame.display.flip()
 
+# Check if the script is being run as the main program
 if __name__ == "__main__":
     game = PuzzleGame()
     game.run()
