@@ -250,7 +250,9 @@ class EarthGame:
                 self._display_congratulations()
                 pygame.mixer.music.stop()
                 return self.solved
-                
+            mouse_pos = pygame.mouse.get_pos()
+            img_of_cursor = pygame.transform.scale(pygame.image.load("sources/images/main_menu/mouse_cursor.png").convert_alpha(),(30,40))
+            self.screen.blit(img_of_cursor, mouse_pos)    
             pygame.display.flip()
 
 # Check if the script is being run as the main program

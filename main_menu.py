@@ -105,7 +105,9 @@ class MainMenu:
                 icon_rect = option_icon.get_rect(center=((j + 0.5) * tile_width, (i + 0.5) * tile_height))
                 # Blit the icon to the screen
                 self.screen.blit(option_icon, icon_rect)
-                
+        mouse_pos = pygame.mouse.get_pos()
+        img_of_cursor = pygame.transform.scale(pygame.image.load("sources/images/main_menu/mouse_cursor.png").convert_alpha(),(30,40))
+        self.screen.blit(img_of_cursor, mouse_pos)        
         pygame.display.update()
 
 
@@ -213,6 +215,7 @@ class MainMenu:
         Run the main menu loop.
         """
         # Show the introduction
+        pygame.mouse.set_visible(False)
         self.show_intro()
 
         # Load and play the menu music
