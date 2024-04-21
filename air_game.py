@@ -43,7 +43,7 @@ class AirGame:
         self.runes_position_y = None
         self.runes_name = ['fire', 'water', 'earth', 'air', 'light', 'dark', 'life']
         #player
-        self.player = self.Player(self,100, self.H//2,self.H)
+        self.player = self.Player(self,100, self.H//2)
         self.player_group = pygame.sprite.Group()
         self.player_group.add(self.player)
         self.clouds_group = pygame.sprite.Group()
@@ -60,16 +60,21 @@ class AirGame:
     
     class Player(pygame.sprite.Sprite):
         """A class representing the player"""
-        def __init__(self,game_instance, x, y,H):
+        def __init__(self,game_instance, x, y):
             """
+            Initialize the player by taking the game instance and the initial x and y coordinates as a arguments.
+            Creating the player's images and setting the initial position and velocity and mask for collision detection.
             
+            Keyword arguments:
+                game_instance(globalizing variable): An instance of the AirGame class.
+                x (int): The initial x-coordinate of the player.
+                y (int): The initial y-coordinate of the player.
             """
             super().__init__()
             self.game_instance = game_instance
             self.images = []
             self.index = 0
             self.counter = 0
-            self.H = H
             for i in range(3):
                 img = pygame.transform.scale(pygame.image.load(f'sources/images/air/player{i}.png').convert_alpha(), (75, 70))
                 self.images.append(img)
@@ -79,7 +84,12 @@ class AirGame:
             self.velocity = 0
 
         def update(self):
-            """Update the player's position and animation"""
+            """
+            Update the player's position and animation.
+            If the game is not over and the space key is pressed, the player will move down(gravitation).
+            By pressing the space key, the player will move up.
+            Each time the player moves, the player's image will change to create an animation.
+            """
             if not self.game_instance.game_over:
                 key = pygame.key.get_pressed()
                 if key[pygame.K_SPACE] and self.rect.top - 35 > 0:
@@ -104,6 +114,15 @@ class AirGame:
     class Cloud(pygame.sprite.Sprite):
         """A class representing a cloud"""
         def __init__(self,game_instance, x, y, index):
+            """
+            Initialize a cloud sprite.
+
+            Keyword arguments:
+                game_instance(globalizing variable): An instance of the AirGame class.
+                x (int): The initial x-coordinate of the cloud.
+                y (int): The initial y-coordinate of the cloud.
+                index (int): The index of the cloud image.
+            """
             super().__init__()
             self.game_instance = game_instance
             self.image = pygame.transform.scale(pygame.image.load(f'sources/images/air/cloud{index}.png').convert_alpha(), (200, 150))
@@ -112,7 +131,11 @@ class AirGame:
             self.speed_clouds = self.game_instance.speed_clouds
 
         def update(self):
-            """Update the cloud position"""
+            """
+            Update the cloud position by moving it to the left.
+            If the cloud is out of the screen, it will be deleted.
+            Every time a cloud is deleted, the speed of the clouds will increase.
+            """
             self.rect.x -= self.speed_clouds
             if self.rect.right < 0:
                 self.kill()
@@ -121,6 +144,15 @@ class AirGame:
     class Rune(pygame.sprite.Sprite):
         """A class representing a rune"""
         def __init__(self,game_instance, x, y, index):
+            """
+            Initialize a rune sprite by taking the initial x and y coordinates, and the index of the rune image as arguments.
+
+            Args:
+                game_instance(globalizing variable): An instance of the AirGame class.
+                x (int): The initial x-coordinate of the rune.
+                y (int): The initial y-coordinate of the rune.
+                index (int): The index of the rune image.
+            """
             super().__init__()
             self.game_instance = game_instance
             self.index = index
@@ -129,12 +161,21 @@ class AirGame:
             self.speed_runes = self.game_instance.speed_runes
 
         def update(self):
-            """Update the rune position"""
+            """
+            Update the rune position by moving it to the left.
+            If the rune is out of the screen, it will be deleted.
+            """
             self.rect.x -= self.speed_runes
             if self.rect.right < 0:
                 self.kill()
     
     def game_over_menu(self):
+        """
+        Display the game over menu.
+
+        Returns:
+            None
+        """
         pygame.mixer.music.stop()
         pygame.mixer.Sound(('sources/sounds/air/lose_menu.mp3')).play(1)
         self.screen.fill('Black')
@@ -148,6 +189,12 @@ class AirGame:
         return None
      
     def win_game_menu(self):
+        """
+        Display the win game menu.
+
+        Returns:
+            None
+        """
         pygame.mixer.music.stop()
         pygame.mixer.Sound(('sources/sounds/air/win_menu.mp3')).play(1)
         self.screen.fill('Black')
@@ -161,6 +208,11 @@ class AirGame:
         return None
     
     def updating_groups(self):
+        """
+        Draw and update the positions of player, clouds, and runes.
+        Returns:
+            None
+        """
         self.player_group.draw(self.screen)
         self.player_group.update()
         self.clouds_group.draw(self.screen)
@@ -169,6 +221,14 @@ class AirGame:
         self.runes_group.update()
     
     def collision_check(self):
+        """
+        Check for collision between the player and clouds and runes.
+        If the player collides with a cloud, the game will be over.
+        If the player collides with a rune, the player will collect the rune and the rune will be deleted.
+        If the player is on top of a cloud, the cloud will be deleted.
+        Returns:
+            None
+        """
         #mask collision
         if pygame.sprite.spritecollide(self.player,self.clouds_group,False,pygame.sprite.collide_mask): #collision with clouds
             self.game_over = True 
@@ -188,7 +248,19 @@ class AirGame:
             self.flying = False
     
     def run_game(self):
-        """Run the game"""
+        """
+        If the space key is pressed, the player will start flying and playing music and run the main game loop.
+        Every frame, the game will draw the screen by updating background, groups, and texts.
+        Texts will show the number of collected runes and the name of the collected rune.
+        Every frame, the game will spawn clouds and runes by checking the time and subtracting the last time if it is bigger than the frequency.
+        If the player collects a rune the collected rune name will be displayed on screen.
+        If the player collects all the runes, the game will be won.
+        Runnnig the game loop until the game is over or the game is won.
+        If the game is over, the game over menu will be displayed.
+        If the game is won, the win game menu will be displayed.
+        Returns:
+            bool: True if the game is won, False if the game is lost.
+        """
         self.running = True
         while self.running:
             if self.game_over == False and self.game_win == False:
@@ -258,12 +330,22 @@ class AirGame:
                         pygame.mixer.music.play(-1)
                         pygame.mixer.music.set_volume(0.2)  
     def draw_menu(self):
-        """Draw the menu screen"""
+        """
+        Draw the menu screen.
+
+        Returns:
+            None
+        """
         self.screen.blit(self.background_image_of_menu, (0, 0))
         pygame.display.flip()
 
     def handle_menu(self):
-        """Handle menu input"""
+        """
+        Handle menu input.
+
+        Returns:
+            bool: True if the player starts the game, False if the player quits.
+        """
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
@@ -272,7 +354,12 @@ class AirGame:
         return None
 
     def start(self):
-        """Start the game"""
+        """
+        Start the game.
+
+        Returns:
+            bool: True if the game is won, False if the game is lost or quit.
+        """
         self.running = True
         pygame.mixer.music.load('sources/sounds/air/air_menu.mp3')
         pygame.mixer.music.play(1)
